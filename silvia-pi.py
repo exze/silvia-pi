@@ -105,7 +105,7 @@ def pid_loop(dummy,state):
   import board
   import busio
   import digitalio
-  import adafruit_max31855
+  import adafruit_max31865
   import PID as PID
   import config as conf
 
@@ -113,11 +113,11 @@ def pid_loop(dummy,state):
   sys.stderr = open("pid.err.log2", "a")
 
   def c_to_f(c):
-    return c * 9.0 / 5.0 + 32.0
+     return c * 9.0 / 5.0 + 32.0
 
   spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
-  cs = digitalio.DigitalInOut(board.D0)
-  sensor = adafruit_max31855.MAX31855(spi, cs)
+  cs = digitalio.DigitalInOut(board.D5)
+  sensor = adafruit_max31865.MAX31865(spi, cs)
 
   print("got sensor:", sensor)
 
@@ -152,7 +152,7 @@ def pid_loop(dummy,state):
         nanct = 0
 
       tempf = c_to_f(tempc)
-      temphist[i%5] = tempf
+      temphist[i%5] = tempc
       avgtemp = sum(temphist)/len(temphist)
 
       if avgtemp < 100 :
@@ -184,7 +184,7 @@ def pid_loop(dummy,state):
         avgpid = sum(pidhist)/len(pidhist)
 
       state['i'] = i
-      state['tempf'] = round(tempf,2)
+      state['tempf'] = round(tempc,2)
       state['avgtemp'] = round(avgtemp,2)
       state['pidval'] = round(pidout,2)
       state['avgpid'] = round(avgpid,2)
@@ -218,7 +218,7 @@ def rest_server(dummy,state):
 
   basedir = os.path.dirname(__file__)
   #wwwdir = basedir+'/www/'
-  wwwdir = "/home/pi/silvia-pi/www"
+  wwwdir = "/root/silvia-pi/www"
 
   @route('/home')
   def docroot():
@@ -240,7 +240,7 @@ def rest_server(dummy,state):
   def post_settemp():
     try:
       settemp = float(request.forms.get('settemp'))
-      if settemp >= 200 and settemp <= 260 :
+      if settemp >= 20 and settemp <= 260 :
         state['settemp'] = settemp
         return str(settemp)
       else:
@@ -334,13 +334,13 @@ if __name__ == '__main__':
   h.daemon = True
   h.start()
 
-  print("Starting REST Server thread...")
+  print ("Starting REST Server thread...")
   r = Process(target=rest_server,args=(1,pidstate))
   r.daemon = True
   r.start()
 
   #Start Watchdog loop
-  print("Starting Watchdog...")
+  print ("Starting Watchdog...")
   piderr = 0
   weberr = 0
   weberrflag = 0
@@ -349,7 +349,6 @@ if __name__ == '__main__':
   lasti = pidstate['i']
   sleep(1)
 
-  print("Starting loop...", p.is_alive(), h.is_alive(), r.is_alive(), s.is_alive())
   while p.is_alive() and h.is_alive() and r.is_alive() and s.is_alive():
     curi = pidstate['i']
     if curi == lasti :
@@ -360,7 +359,7 @@ if __name__ == '__main__':
     lasti = curi
 
     if piderr > 9 :
-      print('ERROR IN PID THREAD, RESTARTING')
+      print ('ERROR IN PID THREAD, RESTARTING')
       p.terminate()
 
     try:
@@ -375,7 +374,7 @@ if __name__ == '__main__':
       weberr = weberr + 1
 
     if weberr > 9 :
-      print('ERROR IN WEB SERVER THREAD, RESTARTING')
+      print ('ERROR IN WEB SERVER THREAD, RESTARTING')
       r.terminate()
 
     weberrflag = 0
