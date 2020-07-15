@@ -184,7 +184,7 @@ def pid_loop(dummy,state):
         avgpid = sum(pidhist)/len(pidhist)
 
       state['i'] = i
-      state['tempf'] = round(tempc,2)
+      state['tempc'] = round(tempc,2)
       state['avgtemp'] = round(avgtemp,2)
       state['pidval'] = round(pidout,2)
       state['avgpid'] = round(avgpid,2)
@@ -240,7 +240,7 @@ def rest_server(dummy,state):
   def post_settemp():
     try:
       settemp = float(request.forms.get('settemp'))
-      if settemp >= 20 and settemp <= 260 :
+      if settemp >= 20 and settemp <= 130 :
         state['settemp'] = settemp
         return str(settemp)
       else:

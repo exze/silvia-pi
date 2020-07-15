@@ -128,14 +128,14 @@ setInterval(function() {
         }
         curtemp.append(new Date().getTime(), resp.tempc);
         settemp.append(new Date().getTime(), resp.settemp);
-        settempm.append(new Date().getTime(), resp.settemp-4);
-        settempp.append(new Date().getTime(), resp.settemp+4);
+        settempm.append(new Date().getTime(), resp.settemp-1);
+        settempp.append(new Date().getTime(), resp.settemp+1);
         pterm.append(new Date().getTime(), resp.pterm);
         iterm.append(new Date().getTime(), resp.iterm);
         dterm.append(new Date().getTime(), resp.dterm);
         pidval.append(new Date().getTime(), resp.pidval);
         avgpid.append(new Date().getTime(), resp.avgpid);
-        $("#curtemp").html(resp.tempf.toFixed(2));
+        $("#curtemp").html(resp.tempc.toFixed(2));
         $("#pterm").html(resp.pterm.toFixed(2));
         $("#iterm").html(resp.iterm.toFixed(2));
         $("#dterm").html(resp.dterm.toFixed(2));
